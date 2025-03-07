@@ -25,7 +25,7 @@ socket.on("initmessages", (messagelog) => {
     for (const [numofmessages, {id, message}] of Object.entries(messagelog)) {
 
         console.log(`${numofmessages}: ${id}, ${message}`);
-        addmessage(id, message, false)
+        addmessage(id, message, false);
     }
 
 })

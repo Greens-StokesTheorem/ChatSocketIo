@@ -9,10 +9,7 @@ const fs = require("fs");
 
 
 
-
-
 let numofmessages = 0;
-
 let messageslog = {};
 
 if (fs.existsSync("data.json")) {
@@ -20,6 +17,7 @@ if (fs.existsSync("data.json")) {
     console.log("readfile")
 }
 
+numofmessages = Object.keys(messageslog).length - 1;
 
 
 
