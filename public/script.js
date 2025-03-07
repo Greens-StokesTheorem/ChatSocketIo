@@ -11,15 +11,15 @@ socket.on("connect", () => {
 
     PlayerId = socket.id;
     console.log(PlayerId);
-
+    document.getElementById("playerid").innerHTML = PlayerId;
 
 
 })
 
 
-socket.on("sentmessage", ({id: PlayerId, message: message}) => {
+socket.on("sentmessage", ({id: player_id, message: message}) => {
 
-    addmessage({PlayerId, message});
+    addmessage(player_id, message, false);
 
 })
 
@@ -30,17 +30,25 @@ button.addEventListener("click", () => {
 
     socket.emit("sentmessage", {id: PlayerId, message: textbox.value});
     // addmessage(textbox.value);
-    addmessage({PlayerId, message: textbox.value});
+    addmessage(PlayerId, textbox.value, true);
 
 })
 
 
 
-function addmessage({id, message}) {
+function addmessage(id, message,owner) {
 
     const newmessage = document.createElement("p");
     newmessage.innerHTML = `${id}: ${message}`;
+
+    if (owner) { 
+        newmessage.style.color = "red";
+    }
     messagearea.appendChild(newmessage);
 
 
+
+
 }
+
+

@@ -8,7 +8,7 @@ const port = 8080;
 const fs = require("fs");
 // const { Socket } = require('dgram');
 
-
+let messageslog = {};
 
 
 app.use(express.static("public"));
@@ -26,6 +26,7 @@ io.on("connection", (socket) => {
 
 	socket.on("sentmessage", ({id: PlayerId, message: message}) => {
 		// console.log(message);
+		messageslog[PlayerId] = {}
 		socket.broadcast.emit("sentmessage", {id: PlayerId, message: message});
 	})
 
