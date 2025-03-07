@@ -28,9 +28,37 @@ socket.on("sentmessage", ({id: player_id, message: message}) => {
 
 button.addEventListener("click", () => {
 
-    socket.emit("sentmessage", {id: PlayerId, message: textbox.value});
-    // addmessage(textbox.value);
-    addmessage(PlayerId, textbox.value, true);
+    let messagevalue = textbox.value;
+    if (messagevalue.length > 0) {
+
+        socket.emit("sentmessage", {id: PlayerId, message: messagevalue});
+        // addmessage(textbox.value);
+        addmessage(PlayerId, textbox.value, true);
+        textbox.value = "";
+
+
+    }
+
+})
+
+
+document.addEventListener("keydown", (e) => {
+
+
+    if (e.code == "Enter") {
+
+        
+        let messagevalue = textbox.value;
+        if (messagevalue.length > 0) {
+    
+            socket.emit("sentmessage", {id: PlayerId, message: messagevalue});
+            // addmessage(textbox.value);
+            addmessage(PlayerId, textbox.value, true);
+            textbox.value = "";
+    
+        }
+
+    }
 
 })
 
