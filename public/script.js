@@ -30,7 +30,7 @@ button.addEventListener("click", () => {
 
     socket.emit("sentmessage", {id: PlayerId, message: textbox.value});
     // addmessage(textbox.value);
-    addmessage({id: PlayerId, message: textbox.value});
+    addmessage({PlayerId, message: textbox.value});
 
 })
 
