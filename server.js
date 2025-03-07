@@ -24,9 +24,9 @@ io.on("connection", (socket) => {
 
 	console.log(`Player: ${socket.id} has joined`)
 
-	socket.on("sentmessage", (message) => {
-		console.log(message);
-		socket.broadcast.emit("sentmessage", message);
+	socket.on("sentmessage", ({id: PlayerId, message: message}) => {
+		// console.log(message);
+		socket.broadcast.emit("sentmessage", {id: PlayerId, message: message});
 	})
 
 

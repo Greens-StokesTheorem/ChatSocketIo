@@ -17,9 +17,9 @@ socket.on("connect", () => {
 })
 
 
-socket.on("sentmessage", (message) => {
+socket.on("sentmessage", ({id: PlayerId, message: message}) => {
 
-    addmessage(message);
+    addmessage({PlayerId, message});
 
 })
 
@@ -28,7 +28,7 @@ socket.on("sentmessage", (message) => {
 
 button.addEventListener("click", () => {
 
-    socket.emit("sentmessage", textbox.value);
+    socket.emit("sentmessage", {id: PlayerId, message: textbox.value});
     // addmessage(textbox.value);
     addmessage({id: PlayerId, message: textbox.value});
 
