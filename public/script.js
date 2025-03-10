@@ -84,7 +84,8 @@ function addmessage(id, message, owner) {
         newmessage.style.color = "red";
     }
     messagearea.appendChild(newmessage);
-
+    // container.insertBefore(newFreeformLabel, container.firstChild);
+    newmessage.scrollIntoView({behavior: "smooth"});
 
 }
 
@@ -92,3 +93,9 @@ function addmessage(id, message, owner) {
 function initmessages() {
     //
 }
+
+textbox.addEventListener("focus", () => {
+
+    
+
+})
