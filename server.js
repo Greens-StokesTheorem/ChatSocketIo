@@ -1,12 +1,12 @@
 const express = require('express');
 const app = express();
 const { Server } = require('socket.io');
-// const router = express.Router();
 const http = require('http');
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
 const fs = require("fs");
+const session = require('express-session');
 
 
 
@@ -15,6 +15,8 @@ let numofusers = 0;
 let userslog = {};
 let messageslog = {};
 
+
+//		Json management code
 if (fs.existsSync("data.json")) {
 
     messageslog = JSON.parse(fs.readFileSync("data.json", "utf8"));
@@ -22,13 +24,42 @@ if (fs.existsSync("data.json")) {
 	numofmessages = Object.keys(messageslog).length - 1;
 
 }
-
 if (fs.existsSync("users.json")) {
 	
     userslog = JSON.parse(fs.readFileSync("users.json", "utf8"));
     console.log("readfile")
 
 }
+//	===============================
+
+const requireAuth = (req, res, next) => {
+    if (req.session.userId) {
+		console.log(req.session);
+        next(); // User is authenticated, continue to next middleware
+    } else {
+		console.log(req.session);
+        res.redirect('/login'); // User is not authenticated, redirect to login page
+    };
+};
+
+const isAdmin = (req, res, next) => {
+    if (req.session.role == "Admin") {
+		console.log("passed");
+        next(); // User is authenticated, continue to next middleware
+    } else {
+
+        res.redirect('/loggedin'); // User is not authenticated, redirect to login page
+    };
+};
+
+app.set('view engine', 'ejs');
+
+app.use(session({
+    secret: 'secretkeys',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 
 
 app.use(express.static("public"));
@@ -37,10 +68,24 @@ app.use(express.json());
 app.get('/', (req, res) => {
 
     res.sendFile("./index.html");
+	console.log(req.session);
 	
 });
 
+app.get("/loggedin", requireAuth, (req, res) => {
 
+	res.render("dashboard");
+
+});
+
+app.get("/admin", isAdmin, (req, res) => {
+
+	res.render("admin");
+
+});
+
+
+//	Register user
 app.post("/api/data", (req,res) => {
 
 	const data = req.body;
@@ -66,12 +111,12 @@ app.post("/api/data", (req,res) => {
 
 });
 
-
+//	Login user
 app.post("/api/login", (req, res) => {
 
 	const logindata = req.body;
 
-	console.log(logindata)
+	// console.log(logindata)
 
 	//	Match
 	if (checkduplicate(userslog, logindata.name) != -1) {
@@ -79,8 +124,13 @@ app.post("/api/login", (req, res) => {
 		//	Login matched
 		if (userslog[logindata.name].password === logindata.password) {
 
+			//	This branch is the login branch
 			console.log("Login matched!")
 			res.send({message: "Username and Password matched, login success", status: 1});
+			req.session.userId = logindata.name;
+			req.session.role = userslog[logindata.name].usertype;
+			console.log(req.session)
+			req.session.save();
 
 
 		} else {

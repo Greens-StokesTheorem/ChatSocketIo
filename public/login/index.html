@@ -12,6 +12,19 @@
     line-height: 0;
 }
 
+#loginstatus {
+    width: 9rem;
+    height: 3rem;
+    background-color: rgb(255, 0, 0);
+    border-radius: 4.5rem;
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+}
+
 </style>
 
 <body>
@@ -33,6 +46,9 @@
     <div id="userarea">
 <!-- users goes here -->
     </div>
+
+
+    <div id="loginstatus"></div>
 
 
     <script src="/socket.io/socket.io.js"></script>
@@ -109,6 +125,7 @@
                     document.getElementById("passinput").value = "";
 
                     document.getElementById("status").innerHTML = "Login success"
+                    document.getElementById("loginstatus").innerHTML = "Logged in"
 
                 }
 
