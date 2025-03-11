@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const { Server } = require('socket.io');
+// const router = express.Router();
 const http = require('http');
 const server = http.createServer(app);
 const io = new Server(server);
@@ -10,30 +11,96 @@ const fs = require("fs");
 
 
 let numofmessages = 0;
+let numofusers = 0;
+let userslog = {};
 let messageslog = {};
 
 if (fs.existsSync("data.json")) {
+
     messageslog = JSON.parse(fs.readFileSync("data.json", "utf8"));
     console.log("readfile")
 	numofmessages = Object.keys(messageslog).length - 1;
 
 }
 
+if (fs.existsSync("users.json")) {
+	
+    userslog = JSON.parse(fs.readFileSync("users.json", "utf8"));
+    console.log("readfile")
 
+}
 
 
 app.use(express.static("public"));
+app.use(express.json());
 
 app.get('/', (req, res) => {
 
     res.sendFile("./index.html");
+	
 });
 
+
+app.post("/api/data", (req,res) => {
+
+	const data = req.body;
+
+
+	//	If exists already
+
+	// console.log(userslog);
+
+	if (checkduplicate(userslog, data.name) != -1) {
+
+		res.send({message: "This username already exists", status: 0})
+		// console.log(userslog);
+
+	} else {
+
+		userslog[`${data.name}`] = {password: data.password, usertype: "user"};
+		res.send({message: "Registered", status: 1})
+		fs.writeFileSync("users.json", JSON.stringify(userslog, null, 4));
+
+
+	}
+
+});
+
+
+app.post("/api/login", (req, res) => {
+
+	const logindata = req.body;
+
+	console.log(logindata)
+
+	//	Match
+	if (checkduplicate(userslog, logindata.name) != -1) {
+
+		//	Login matched
+		if (userslog[logindata.name].password === logindata.password) {
+
+			console.log("Login matched!")
+			res.send({message: "Username and Password matched, login success", status: 1});
+
+
+		} else {
+
+			res.send({message: "Username or Password is incorrect", status: 0});
+		}
+
+	} else {
+
+		res.send({message: "Username or Password is incorrect", status: 0});
+
+	}
+
+
+})
 
 
 io.on("connection", (socket) => {
 
-	console.log(`Player: ${socket.id} has joined`)
+	// console.log(`Player: ${socket.id} has joined`)
 	socket.emit("initmessages", messageslog);
 
 
@@ -52,6 +119,21 @@ io.on("connection", (socket) => {
 	})
 
 
+
+	socket.on("getusers", (id) => {
+
+		// console.log(id);
+		// console.log(userslog);
+		io.to(id).emit("getusers", userslog);
+
+	});
+
+
+	socket.on("test", (id) => {
+		// console.log(id)
+	})
+
+
 });
 
 
@@ -63,3 +145,29 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
     console.log(`Server is listening at the port: ${port}`);
 });
+
+
+function checkduplicate(obj, name) {
+
+	let keyarray2 = Object.keys(obj);
+	let n = keyarray2.length;
+	let attributearray = [];
+
+	//	If empty don't have to check
+	if (n == 0) return false;
+
+	for (let i = 0; i < n; i++) {
+		
+		// console.log(keyarray2[i]);
+		let attri = keyarray2[i].toLowerCase()
+		attributearray.push(attri);
+
+	}
+
+	// console.log(attributearray);
+
+
+	return attributearray.indexOf(name.toLowerCase());
+
+
+}

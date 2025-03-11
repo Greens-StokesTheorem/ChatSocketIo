@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+
+#userarea {
+    line-height: 0;
+}
+
+</style>
+
+<body>
+    
+
+
+    <h1>Login</h1>
+
+    <form id="inputform">
+        <input placeholder="Name" id="nameinput" required>
+        <input placeholder="Password" id="passinput" required>
+
+        <button type="submit">Submit</button>
+
+        <p id="status">status</p>
+
+    </form>
+
+    <div id="userarea">
+<!-- users goes here -->
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        let socket = io();
+        let PlayerId = "";
+        const submitform = document.getElementById("inputform");
+        const loginbutton = document.getElementById("loginPage")
+
+        socket.on("connect", () => {
+            PlayerId = socket.id;
+            socket.emit("getusers", PlayerId);
+        })
+
+
+
+        socket.emit("getusers", PlayerId);
+
+
+        socket.on("getusers", (userslog) => {
+
+            // console.log(userslog);
+            for(const [name, {password, usertype}] of Object.entries(userslog)) {
+
+                let userentry = document.createElement("h4")
+                userentry.id = name;
+                userentry.innerHTML = `${name}:  ${password}   ==>  Type ${usertype}`;
+                document.getElementById("userarea").appendChild(userentry);
+
+            };
+
+        });
+
+
+
+
+
+
+
+
+
+        submitform.addEventListener("submit", async (evnet) => {
+            
+            event.preventDefault();
+
+            let LoginData = {
+                name: document.getElementById("nameinput").value.trim(),
+                password: document.getElementById("passinput").value.trim()
+            };
+
+
+            if (LoginData.password.includes(" ") || LoginData.name.includes(" ")) {
+
+                console.log("Neither Name or Password can contain spaces");
+                document.getElementById("status").innerHTML = "Neither Name or Password can contain spaces";
+
+            } else {
+
+                const response = await fetch("/api/login", {
+
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(LoginData),
+                });
+
+
+                const verify = await response.json();
+
+                if (verify.status == 1) {
+                    document.getElementById("nameinput").value = "";
+                    document.getElementById("passinput").value = "";
+
+                    document.getElementById("status").innerHTML = "Login success"
+
+                }
+
+
+                // console.log(verify);
+
+            }
+        })
+
+
+
+    </script>
+
+
+</body>
+
+
+
+
+
+</html>

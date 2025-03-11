@@ -47,7 +47,6 @@ button.addEventListener("click", () => {
     if (messagevalue.length > 0) {
 
         socket.emit("sentmessage", {id: PlayerId, message: messagevalue});
-        // addmessage(textbox.value);
         addmessage(PlayerId, textbox.value, true);
         textbox.value = "";
 

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+    <h1>Post API tutorial</h1>
+
+    <form id="inputform">
+        <input placeholder="Name" id="nameinput" required>
+        <input placeholder="Password" id="passinput" required>
+
+        <button type="submit">Submit</button>
+
+        <p id="status">status</p>
+
+    </form>
+
+    <button id="loginPage">Login</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+        const submitform = document.getElementById("inputform");
+        const loginbutton = document.getElementById("loginPage")
+
+
+
+
+
+        submitform.addEventListener("submit", async (event) => {
+            
+            event.preventDefault();
+
+            let LoginData = {
+                name: document.getElementById("nameinput").value.trim(),
+                password: document.getElementById("passinput").value.trim()
+            };
+
+            if (LoginData.password.includes(" ") || LoginData.name.includes(" ")) {
+
+                console.log("Neither Name or Password can contain spaces");
+                document.getElementById("status").innerHTML = "Neither Name or Password can contain spaces";
+
+            } else {
+
+                const response = await fetch("/api/data", {
+
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(LoginData),
+                });
+
+
+                const verify = await response.json();
+
+                if (verify.status == 1) {
+                    clearinput();
+                }
+
+                document.getElementById("status").innerHTML = verify.message;
+
+                console.log(verify);
+
+            }
+        })
+
+
+
+        document.addEventListener("keydown", (e) => {
+
+            if (e.code == "Space") socket.emit("outputusers")
+
+        })
+
+        loginbutton.addEventListener("click", () => {
+
+            location.href = `${window.location.origin}/login`
+
+        })
+
+        const clearinput = () => {
+
+            document.getElementById("nameinput").value = "";
+            document.getElementById("passinput").value = "";
+
+        }
+
+
+    </script>
+
+
+</body>
+
+
+
+
+
+</html>
