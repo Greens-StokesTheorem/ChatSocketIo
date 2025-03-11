@@ -204,7 +204,7 @@ function checkduplicate(obj, name) {
 	let attributearray = [];
 
 	//	If empty don't have to check
-	if (n == 0) return false;
+	// if (n == 0) return false;
 
 	for (let i = 0; i < n; i++) {
 		
