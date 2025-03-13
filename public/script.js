@@ -12,21 +12,24 @@ let messages = {};
 
 socket.on("connect", () => {
 
-    PlayerId = socket.id;
-    console.log(PlayerId);
-    document.getElementById("playerid").innerHTML = PlayerId;
+    // PlayerId = socket.id;
+    // document.getElementById("playerid").innerHTML = PlayerId;
+
+    // getLoginfunc(socket.id);
 
 })
 
 
 socket.on("initmessages", (messagelog) => {
 
-    // console.log({messageid: messageid, messageinfo: {id: PlayerId, message: message}})
-    for (const [numofmessages, {id, message}] of Object.entries(messagelog)) {
+    PlayerId = socket.id;
+    document.getElementById("playerid").innerHTML = PlayerId;
 
-        console.log(`${numofmessages}: ${id}, ${message}`);
-        addmessage(id, message, false);
-    }
+    // getLoginfunc(socket.id);
+
+
+    // console.log({messageid: messageid, messageinfo: {id: PlayerId, message: message}})
+    loopentry(messagelog, socket.id);
 
 })
 
@@ -78,8 +81,11 @@ function addmessage(id, message, owner) {
 
     const newmessage = document.createElement("p");
     newmessage.innerHTML = `${id}: ${message}`;
+    // console.log(id);
+    // console.log(PlayerId);
 
-    if (owner) { 
+    if (id == PlayerId) { 
+
         newmessage.style.color = "red";
     }
     messagearea.appendChild(newmessage);
@@ -89,12 +95,53 @@ function addmessage(id, message, owner) {
 }
 
 
-function initmessages() {
-    //
-}
 
-textbox.addEventListener("focus", () => {
 
     
 
-})
+async function loopentry(messages, socketId) {
+
+    await getLoginfunc(socketId);
+
+    for (const [numofmessages, {id, message}] of Object.entries(messages)) {
+
+        // console.log(`${numofmessages}: ${id}, ${message}`);
+        addmessage(id, message, false);
+    }
+
+}
+
+
+const getLoginfunc = async (socketid) => {
+
+    const getLogin = await fetch("/api/session", {
+
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        // body: JSON.stringify(),
+
+    });
+
+    const result = await getLogin.json();
+
+    // console.log(result.message);
+
+    if (result.status == 1) {
+        console.log("User is logged in");
+        PlayerId = result.message.userId;
+
+
+    } else if (result.status == 0) {
+
+        // console.log("User is not logged in");
+        PlayerId = socketid;
+
+    }
+
+    document.getElementById("playerid").innerHTML = PlayerId;    
+
+
+};
+

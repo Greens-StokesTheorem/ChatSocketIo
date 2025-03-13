@@ -21,7 +21,7 @@ if (fs.existsSync("data.json")) {
 
     messageslog = JSON.parse(fs.readFileSync("data.json", "utf8"));
     console.log("readfile")
-	numofmessages = Object.keys(messageslog).length - 1;
+	numofmessages = Object.keys(messageslog).length;
 
 }
 if (fs.existsSync("users.json")) {
@@ -127,8 +127,9 @@ app.post("/api/login", (req, res) => {
 			//	This branch is the login branch
 			console.log("Login matched!")
 			res.send({message: "Username and Password matched, login success", status: 1});
-			req.session.userId = logindata.name;
-			req.session.role = userslog[logindata.name].usertype;
+			req.session.sessioninfo = {userId: logindata.name, role: userslog[logindata.name].usertype};
+			// req.session.userId = logindata.name;
+			// req.session.role = userslog[logindata.name].usertype;
 			console.log(req.session)
 			req.session.save();
 
@@ -148,9 +149,35 @@ app.post("/api/login", (req, res) => {
 })
 
 
+app.post("/api/session", (req, res) => {
+
+	// console.log("Get login");
+	// console.log(req.session);
+
+	if (req.session.sessioninfo) {
+
+		res.send({message: req.session.sessioninfo, status: 1});
+
+	} else {
+
+		res.send({message: req.session, status: 0});
+
+	}
+
+});
+
+
+
 io.on("connection", (socket) => {
 
 	// console.log(`Player: ${socket.id} has joined`)
+
+
+
+
+
+
+
 	socket.emit("initmessages", messageslog);
 
 
