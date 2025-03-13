@@ -42,7 +42,7 @@ const requireAuth = (req, res, next) => {
     };
 };
 
-const isAdmin = (req, res, nextx) => {
+const isAdmin = (req, res, next) => {
 
 	if (req.session.sessioninfo) {
 
