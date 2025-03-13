@@ -21,7 +21,7 @@ if (fs.existsSync("data.json")) {
 
     messageslog = JSON.parse(fs.readFileSync("data.json", "utf8"));
     console.log("readfile")
-	numofmessages = Object.keys(messageslog).length - 1;
+	numofmessages = Object.keys(messageslog).length;
 
 }
 if (fs.existsSync("users.json")) {
