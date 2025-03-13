@@ -4,12 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+
+
+
 </head>
+
+
+<style>
+
+#commandarea {
+
+    width: 50rem;
+    height: 20rem;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 10rem;
+    top: 20%;
+
+
+
+}
+
+</style>
+
+
+
 <body>
     
     <h1>welcome to the admin panel</h1>
 
 
+    <textarea id="commandarea" placeholder="enter command here"></textarea>
+    <button id="submit">submit</button>
+
+
+    <script>
+
+        const button = document.getElementById("submit");
+        const textarea = document.getElementById("commandarea");
+
+
+        button.addEventListener("click", async (event) => {
+
+            const command = textarea.value;
+
+            const response = await fetch("/api/admin", {
+
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({command: command}),
+
+
+            });
+
+                const reply = await response.json();
+                console.log(reply.message);
+        })
+
+
+
+
+    </script>
 
 </body>
 </html>

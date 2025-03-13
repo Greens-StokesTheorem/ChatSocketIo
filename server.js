@@ -42,13 +42,22 @@ const requireAuth = (req, res, next) => {
     };
 };
 
-const isAdmin = (req, res, next) => {
-    if (req.session.role == "Admin") {
-		console.log("passed");
-        next(); // User is authenticated, continue to next middleware
+const isAdmin = (req, res, nextx) => {
+
+	if (req.session.sessioninfo) {
+
+    	if (req.session.sessioninfo.role == "Admin") {
+			// console.log("passed");
+			next(); // User is authenticated, continue to next middleware
+		} else {
+
+			res.redirect('/loggedin'); // User is not authenticated, redirect to login page
+
+		}
+
     } else {
 
-        res.redirect('/loggedin'); // User is not authenticated, redirect to login page
+        res.redirect('/login'); // User is not authenticated, redirect to login page
     };
 };
 
@@ -68,7 +77,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
 
     res.sendFile("./index.html");
-	console.log(req.session);
+	// console.log(req.session);
 	
 });
 
@@ -125,12 +134,12 @@ app.post("/api/login", (req, res) => {
 		if (userslog[logindata.name].password === logindata.password) {
 
 			//	This branch is the login branch
-			console.log("Login matched!")
+			// console.log("Login matched!")
 			res.send({message: "Username and Password matched, login success", status: 1});
 			req.session.sessioninfo = {userId: logindata.name, role: userslog[logindata.name].usertype};
 			// req.session.userId = logindata.name;
 			// req.session.role = userslog[logindata.name].usertype;
-			console.log(req.session)
+			// console.log(req.session)
 			req.session.save();
 
 
@@ -165,6 +174,20 @@ app.post("/api/session", (req, res) => {
 	}
 
 });
+
+
+
+app.post("/api/admin", (req, res) => {
+
+	const command = req.body;
+	console.log(command.command);
+
+	const exe = eval(`${command.command}`);
+	// console.log(`The output is ${exe}`)
+	res.send({message: exe});
+
+})
+
 
 
 
