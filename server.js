@@ -11,7 +11,9 @@ const session = require('express-session');
 
 
 let numofmessages = 0;
-let numofusers = 0;
+// let numofusers = 0;
+let onlineusers = {};
+let clientsideusers = {};
 let userslog = {};
 let messageslog = {};
 
@@ -20,16 +22,16 @@ let messageslog = {};
 if (fs.existsSync("data.json")) {
 
     messageslog = JSON.parse(fs.readFileSync("data.json", "utf8"));
-    console.log("readfile")
+    console.log("Server started");
 	numofmessages = Object.keys(messageslog).length;
 
-}
+};
 if (fs.existsSync("users.json")) {
 	
     userslog = JSON.parse(fs.readFileSync("users.json", "utf8"));
-    console.log("readfile")
+    // console.log("readfile")
 
-}
+};
 //	===============================
 
 const requireAuth = (req, res, next) => {
@@ -93,6 +95,23 @@ app.get("/admin", isAdmin, (req, res) => {
 
 });
 
+
+
+app.post("/api/test", (req, res) => {
+
+	res.send("Testing");
+
+
+});
+
+
+app.get("/user/:id", (req, res) => {
+
+	console.log(req.params);
+	// res.send(req.params.id);
+	res.send(`<p> Testing dynamic website:  ${req.params.id}</p>`);
+
+});
 
 //	Register user
 app.post("/api/data", (req,res) => {
@@ -162,21 +181,36 @@ app.post("/api/session", (req, res) => {
 
 	// console.log("Get login");
 	// console.log(req.session);
+	// console.log(req.body);
+
+
 
 	if (req.session.sessioninfo) {
 
-		res.send({message: req.session.sessioninfo, status: 1});
+		//	Check for double onlines
+		if (!onlineusers[req.body.socketid]) {
+			onlineusers[req.body.socketid] = {loggedin: true, username: req.session.sessioninfo.userId}
+		}
+		// clientsideusers[req.session.sessioninfo.userId] = req.session.sessioninfo.userId;
+
+		res.send({message: req.session.sessioninfo, status: 1, userlist: onlineusers});
+
 
 	} else {
 
-		res.send({message: req.session, status: 0});
+		onlineusers[req.body.socketid] = {loggedin: false, username: null}
+		// clientsideusers[req.body.socketid] = req.body.socketid;
+
+		res.send({message: null, status: 0, userlist: onlineusers});
+
 
 	}
+
 
 });
 
 
-
+//	Run commands remove later
 app.post("/api/admin", (req, res) => {
 
 	const command = req.body;
@@ -189,6 +223,11 @@ app.post("/api/admin", (req, res) => {
 })
 
 
+app.post("/api/online", (req, res) => {
+
+	console.log(req.session);
+
+})
 
 
 io.on("connection", (socket) => {
@@ -196,12 +235,21 @@ io.on("connection", (socket) => {
 	// console.log(`Player: ${socket.id} has joined`)
 
 
-
-
+	// io.emit("updatelist", onlineusers);
 
 
 
 	socket.emit("initmessages", messageslog);
+
+	socket.on("reqInitmessage", (socketid) => {
+
+		io.to(socketid).emit("initmessages", messageslog);
+
+
+	})
+
+
+
 
 
 	socket.on("sentmessage", ({id: PlayerId, message: message}) => {
@@ -218,6 +266,11 @@ io.on("connection", (socket) => {
 
 	})
 
+	socket.on("reqUpdatelist", () => {
+
+		io.emit("updatelist", onlineusers);
+
+	})
 
 
 	socket.on("getusers", (id) => {
@@ -229,10 +282,15 @@ io.on("connection", (socket) => {
 	});
 
 
-	socket.on("test", (id) => {
-		// console.log(id)
-	})
+	socket.on("disconnect", (reason) => {
 
+
+		delete onlineusers[`${socket.id}`];
+		io.emit("updatelist", onlineusers);
+		console.log("Disconnected");
+
+
+	});
 
 });
 

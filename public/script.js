@@ -1,21 +1,32 @@
 let socket = io();
 let button = document.getElementById("entermessage");
-let textbox = document.getElementById("inputfield");
+let textbox = document.getElementById("messagefield");
 let messagearea = document.getElementById("messagearea")
 let PlayerId;
+const userArea = document.getElementById("onlineusers")
+const mydiv = document.getElementById("onlineusers")
+let pointerdown = false;
+let offx, offy;
+let loggedin = false;
+let interval;
 
 
 let messages = {};
 
 
+socket.on("updatelist", (onlinelist) => {
+
+    console.log("Disocnect");
+    updateuserlist(onlinelist);
+
+})
 
 
-socket.on("connect", () => {
+document.getElementById("loginbutton").addEventListener("click", () => {
 
-    // PlayerId = socket.id;
-    // document.getElementById("playerid").innerHTML = PlayerId;
+    PlayerId = document.getElementById("username").value.trim();
 
-    // getLoginfunc(socket.id);
+    loggedin = true;
 
 })
 
@@ -40,7 +51,6 @@ socket.on("sentmessage", ({id: player_id, message: message}) => {
     addmessage(player_id, message, false);
 
 })
-
 
 
 
@@ -94,20 +104,46 @@ function addmessage(id, message, owner) {
 
 }
 
-
-
-
-    
+ 
 
 async function loopentry(messages, socketId) {
 
     await getLoginfunc(socketId);
+
+    if (!loggedin) {
+
+        function checkregister() {
+
+            document.getElementById("blur").style.display = "block";
+            document.getElementById("logincontainer").style.display = "block";
+
+            if (loggedin) {
+
+                clearInterval(interval);
+                document.getElementById("blur").style.display = "none";
+                document.getElementById("logincontainer").style.display = "none";
+                document.getElementById("onlineusers").style.display = "block"
+        
+                // socket.emit("reqInitmessage", socketId);
+                document.getElementById("playerid").innerHTML = PlayerId;  
+                socket.emit("reqUpdatelist");  
+
+            }
+
+        }
+
+        interval = setInterval(checkregister, 500)
+
+        // waits for user to log in before able to chat
+    }
+
 
     for (const [numofmessages, {id, message}] of Object.entries(messages)) {
 
         // console.log(`${numofmessages}: ${id}, ${message}`);
         addmessage(id, message, false);
     }
+
 
 }
 
@@ -120,7 +156,7 @@ const getLoginfunc = async (socketid) => {
         headers: {
             "Content-Type": "application/json",
         },
-        // body: JSON.stringify(),
+        body: JSON.stringify({socketid}),
 
     });
 
@@ -129,8 +165,14 @@ const getLoginfunc = async (socketid) => {
     // console.log(result.message);
 
     if (result.status == 1) {
+
         console.log("User is logged in");
         PlayerId = result.message.userId;
+
+        document.getElementById("playerid").innerHTML = PlayerId;  
+        // mydiv.style.opacity = "1";
+        socket.emit("reqUpdatelist")  
+        loggedin = true;
 
 
     } else if (result.status == 0) {
@@ -140,8 +182,52 @@ const getLoginfunc = async (socketid) => {
 
     }
 
-    document.getElementById("playerid").innerHTML = PlayerId;    
+
 
 
 };
+
+
+
+function updateuserlist(onlineusers) {
+
+    userArea.textContent = "";
+
+    for (const [id, {loggedin, username}] of Object.entries(onlineusers)) {
+
+        console.log(`${id} status: ${loggedin}     Username: ${username}`);
+
+        const newuser = document.createElement("p")
+        newuser.innerText = (username) ? username : id;
+        newuser.style.textAlign = "center";
+        userArea.appendChild(newuser);
+
+    }
+    
+}
+
+
+
+
+mydiv.addEventListener("pointerdown", (e) => {
+
+    offx = e.clientX - mydiv.offsetLeft;
+    offy = e.clientY - mydiv.offsetTop;
+    pointerdown = true;
+
+})
+
+document.addEventListener("pointermove", (e) => {
+
+    if (pointerdown) {
+        mydiv.style.left = `${e.clientX - offx}px`;
+        mydiv.style.top = `${e.clientY - offy}px`;
+    }
+})
+
+mydiv.addEventListener("pointerup", (e) => {
+
+    pointerdown = false;
+
+})
 

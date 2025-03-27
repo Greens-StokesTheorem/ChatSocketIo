@@ -4,13 +4,13 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>javascript</title>
 
 <style>
 
     body {margin: 0px;}
 
-    #inputfield {
+    #messagefield {
         border-radius: 1.5rem;
         font-size: 1.5rem;
         width: 100%;
@@ -23,7 +23,7 @@
         transform: translate(-50%, -50%);
         padding-left: 1rem;
     }
-    #inputfield:focus {
+    #messagefield:focus {
         outline: none;
     }
     /* body:has(#inputfield:focus) #controlpanel {
@@ -106,6 +106,128 @@
         top: 2%;
     }
 
+    .navigation {
+        /* width: 9rem; */
+        width: 100%;
+        height: 2.5rem;
+        background-color: rgb(70, 221, 231);
+        /* border-radius: 4.5rem; */
+        text-align: center;
+        align-content: center;
+        margin-bottom: 1px;
+    }
+
+    #navibutton {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        left: 50%;
+        top: 20%;
+    }
+ 
+    #onlineusers {
+        position: absolute;
+        width: 20rem;
+        height: 30rem;
+        background-color: rgba(0, 0, 0, 0.342);
+        top: 3%;
+        right: 2%;
+        z-index: 2;
+        backdrop-filter: blur(4px);
+        border-radius: 2rem;
+        box-shadow: 0px 2px 15px 0px #605d63b2;
+        border-style: double;
+        border-width: 1px;
+        border-color: rgba(195, 202, 207, 0.473);
+        overflow: hidden;
+        display: none;
+    }
+
+
+    #blur {
+        display: none;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        backdrop-filter: blur(3px);
+        background-color: rgba(0, 0, 0, 0.411);
+        z-index: 3;
+
+    }
+
+    #logincontainer {
+
+        display: none;
+        position: absolute;
+        top: 44%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(12, 3, 9, 0.411);
+        backdrop-filter: blur(3px);
+        width: 30rem;
+        height: 35rem;
+        z-index: 4;
+        border-radius: 1.5rem;
+        box-shadow: 0px 2px 15px 0px #676569b2;
+        border-style: double;
+        border-width: 2px;
+        border-color: rgba(195, 202, 207, 0.637);
+
+    }
+
+    #logintext {
+
+        color: white;
+        align-self: center;
+        justify-self: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 2.4rem;
+        margin-top: 3rem;
+    }
+
+    .inputfields {
+        margin-bottom: 2rem;
+        width: 20rem;
+        font-size: 1.5rem;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, 0);
+        padding-left: 1rem;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 2px solid;
+        border-color: aliceblue;
+        color: white;
+    }
+    .inputfields::placeholder { color: rgba(226, 225, 225, 0.774); font-size: 1rem;}
+    .inputfields:focus {outline: none;}
+
+    #formcontainer {
+        position: absolute;
+        left: 50%;
+        top: 44%;
+        transform: translate(-50%, -50%);
+        width: fit-content;
+    }
+
+    .loginbutton {
+        width: 21rem;
+        height: 3rem;
+        background-color: white;
+        position: absolute;
+        left: 50%;
+        top: 70%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        align-items: center;
+        border: 0px;
+        border-radius: 6px;
+        font-size: 1.2rem;
+    }
+
 </style>
 
 
@@ -115,13 +237,29 @@
 <body>
     
 
+    <div id="blur"></div>
+
+    <div id="logincontainer">
+
+        <h1 id="logintext">Temporary Login</h1>
+        <div id="formcontainer">
+
+            <input autocomplete="off" class="inputfields" placeholder="Enter name" id="username">
+            <input autocomplete="off" class="inputfields" placeholder="Enter password" id="login">
+
+        </div>
+
+        <button id="loginbutton" class="loginbutton">Log in</button>
+
+    </div>
+
+
 
 
     <div id="controlpanel">
 
-        <!-- <h1 id="playerid"></h1> -->
         <div id="inputcontainer">
-            <input id="inputfield"/>
+            <input autocomplete="off" id="messagefield"/>
             <button id="entermessage">🔍</button>
         </div>
 
@@ -129,21 +267,28 @@
 
     <div id="sidebar" class="sidebar">
 
-        <!-- <label for="playerid">UserID</label>  -->
         <h1 id="playerid"></h1>
 
+        <div id="navibutton">
 
+            <div id="loginscreen" class="navigation" onclick="location.href = '/login' ">Login</div>
+            <div id="about" class="navigation" onclick="location.href = '/about' ">About</div>
+            <div id="admin" class="navigation" onclick="location.href = '/admin' ">Admin</div>
+            <div id="loggedin" class="navigation" onclick="location.href = '/loggedin' ">Dashboard</div>
+
+        </div>
 
 
     </div>
 
+
+    <div id="onlineusers"></div>
 
 
     <div id="messagearea">Message Area</div>
 
     
     <script src="/socket.io/socket.io.js"></script>
-    <!-- <script>alerting();</script> -->
     <script type="text/javascript" src="script.js"></script>
 
 

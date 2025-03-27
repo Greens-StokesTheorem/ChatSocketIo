@@ -34,8 +34,8 @@
     <h1>Login</h1>
 
     <form id="inputform">
-        <input placeholder="Name" id="nameinput" required>
-        <input placeholder="Password" id="passinput" required>
+        <input autocomplete="off" placeholder="Name" id="nameinput" required>
+        <input autocomplete="off" placeholder="Password" id="passinput" required>
 
         <button type="submit">Submit</button>
 
@@ -44,7 +44,7 @@
     </form>
 
     <div id="userarea">
-<!-- users goes here -->
+
     </div>
 
 
@@ -132,6 +132,7 @@
 
                     document.getElementById("status").innerHTML = "Login success"
                     document.getElementById("loginstatus").innerHTML = "Logged in"
+                    const delay = setInterval(location.href = "/", 1500);
 
                 }
 
