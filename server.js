@@ -100,7 +100,7 @@ app.get("/admin", isAdmin, (req, res) => {
 app.post("/api/test", (req, res) => {
 
 	res.send("Testing");
-
+	console.log("req is made");
 
 });
 
