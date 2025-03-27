@@ -6,6 +6,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
 const fs = require("fs");
+const cors = require('cors')
 const session = require('express-session');
 
 
@@ -75,6 +76,7 @@ app.use(session({
 
 app.use(express.static("public"));
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
 
