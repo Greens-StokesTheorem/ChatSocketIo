@@ -101,8 +101,9 @@ app.get("/admin", isAdmin, (req, res) => {
 
 app.post("/api/test", (req, res) => {
 
-	res.send("Testing");
+	res.send({message: "Testing", status: 0});
 	console.log("req is made");
+	
 
 });
 
